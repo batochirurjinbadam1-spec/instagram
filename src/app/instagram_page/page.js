@@ -68,6 +68,10 @@ export default function HomePage() {
     { key: "search", label: "Search", icon: Search, onClick: () => setActive("search") },
     { key: "create", label: "Create", icon: PlusSquare, onClick: () => router.push("/creating_story_page") },
   ]
+function handleComment(post) {
+  if (!post?.id) return;
+  router.push(`/comment_page/${post.id}`);
+}
 
   return (
     <div className="flex min-h-screen bg-muted/30 text-foreground">
@@ -186,7 +190,7 @@ export default function HomePage() {
                   >
                     <Heart className={`h-6 w-6 ${liked[id] ? "fill-red-500 text-red-500" : ""}`} />
                   </Button>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full" onClick={()=>handleComment(post)}>
                     <MessageCircle className="h-6 w-6" />
                   </Button>
                   <Button variant="ghost" size="icon" className="rounded-full">

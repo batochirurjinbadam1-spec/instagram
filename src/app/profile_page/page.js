@@ -29,11 +29,14 @@ function ProfileSkeleton() {
 }
 
 export default function ProfilePage() {
+  const[ file, setFile]= useState(null)
   const router = useRouter()
+  const [username, setUsername]= useState("")
+  const [password, setPassword]= useState("")
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
+  const [searchDiv,setSearchDiv]= useState(false)
   useEffect(() => {
     let cancelled = false
 
@@ -76,9 +79,23 @@ export default function ProfilePage() {
     { label: "followers", value: user?.followers_count ?? 0 },
     { label: "following", value: user?.following_count ?? 0 },
   ]
+  function handlegotologin(){
+    localStorage.removeItem("sb-unzctofvqctackhokxid-auth-token")
+    router.push("/login_page")
+  }
 
+  function handleEditProfile(){
+  setSearchDiv(!searchDiv)
+  }
+  async function handleChangeFile(e){
+    console.log(e.target.files[0])
+    setFile(e.target.file)
+    const response= await supabase.storage
+    .from("profile_image")
+    .upload(`images/${e.target.files[0].name}`,e.target.files[0])
+  }
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       {/* Sticky top bar */}
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur">
         <Button
@@ -103,7 +120,7 @@ export default function ProfilePage() {
         ) : (
           <>
             {/* Profile info */}
-            <section className="flex flex-col items-center gap-6 px-6 py-8 sm:flex-row sm:items-start sm:gap-12">
+            <section className="flex flex-col items-center gap-6 px-6 py-8 sm:flex-row sm:items-start sm:gap-12 z-5">
               {/* Avatar with story-style gradient ring */}
               <div className="rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[3px]">
                 <div className="rounded-full bg-background p-1">
@@ -118,13 +135,17 @@ export default function ProfilePage() {
                     </AvatarFallback>
                   </Avatar>
                 </div>
+                
               </div>
 
               <div className="flex-1 space-y-4 text-center sm:text-left">
                 <div className="flex flex-col items-center gap-3 sm:flex-row">
                   <h2 className="text-xl font-light">{user.username}</h2>
-                  <Button variant="secondary" size="sm">
+                  <Button variant="secondary" size="sm" onClick={handleEditProfile}>
                     Edit profile
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={handlegotologin}>
+                    Log out
                   </Button>
                 </div>
 
@@ -153,6 +174,14 @@ export default function ProfilePage() {
                 <Grid3x3 className="h-4 w-4" />
                 POSTS
               </div>
+              {/* Edit profile */ }
+              {searchDiv&&
+              <div className="absolute bg-green-100 w-full h-screen z-10 flex flex-center"> 
+              <h1>Edit Profile</h1>
+              <input placeholder="Username" onChange={(e)=>setPassword(e.target.value)}/>
+              <input placeholder="bio" onChange={(e)=>setPassword(e.target.value)}/>
+              <input type="file" onChange={(e)=>handleChangeFile(e)}/> 
+              {/* <button onClick={handlePushnewAbout}>Done</button>*/}</div>} 
             </div>
 
             {/* Posts */}
